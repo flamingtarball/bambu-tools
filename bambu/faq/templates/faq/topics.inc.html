@@ -1,0 +1,15 @@
+{% load markup %}
+
+{% for topic in topics %}
+	<article class="faq-topic accordion-group">
+		<div class="accordion-heading">
+			<a href="#topic{{ topic.pk }}" class="accordion-toggle" data-toggle="collapse">{{ topic.question }}</a>
+		</div>
+		
+		<div class="accordion-body collapse" id="topic{{ topic.pk }}">
+			<div class="accordion-inner">
+				{{ topic.answer|markdown }}
+			</div>
+		</div>
+	</article>
+{% endfor %}

@@ -1,0 +1,8 @@
+{% load thumbnail %}
+<p>
+	<a href="{{ attachment.file.url }}" class="attachment-link">
+		{% thumbnail attachment.file size upscale=False as thumb %}
+		<img class="attachment-thumbnail" src="{{ thumb.url }}" alt="{{ attachment.title }}" />
+		{% endthumbnail %}
+	</a>
+</p>

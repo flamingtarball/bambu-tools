@@ -1,0 +1,56 @@
+{% extends 'saas/base.html' %}
+
+{% block content %}
+	<div class="page-header" data-importance="2">
+		<h1>Sign up<small> Get your {{ SITE.name }} account</small></h1>
+	</div>
+	
+	<div class="row">
+		<div class="span6">
+			<form method="post" action="{% url signup %}" class="form-horizontal">
+				{% include 'saas/form.inc.html' %}
+
+				<div class="form-actions">
+					<input type="submit" class="btn btn-success" value="Sign up" />
+					<input type="hidden" name="next" value="{{ next }}" />
+					{% csrf_token %}
+				</div>
+			</form>
+		</div>
+
+		<div class="span6">
+			{% include 'saas/matrix.inc.html' %}
+		</div>
+	</div>
+{% endblock %}
+
+{% block javascript %}
+	{{ block.super }}
+	
+	{% if form.plan %}
+	<script>
+		var plan_prices = {{ plan_prices|safe }};
+		
+		$(document).ready(
+			function() {
+				$('#id_{{ form.plan.html_name }}').bind('change',
+					function(e) {
+						var period = $('#id_{{ form.period.html_name }}');
+						var options = plan_prices[$(this).val()];
+						var initial = period.val();
+						
+						period.find('option').remove();
+						for(var i = 0; i < options.length; i ++) {
+							period.append(
+								'<option value="' + options[i][0] + '">' + options[i][1] + '</option>'
+							);
+						}
+						
+						period.val(initial);
+					}
+				);
+			}
+		);
+	</script>
+	{% endif %}
+{% endblock javascript %}

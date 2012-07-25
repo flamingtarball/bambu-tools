@@ -1,0 +1,18 @@
+{% extends 'blog/base.html' %}
+
+{% block extra_head %}
+	{{ block.super }}
+	
+	{% if post %}
+		<link rel="alternate" type="application/rss+xml" title="Blog feed" href="http://{{ SITE.domain }}{% url blog_posts_feed %}" />
+	{% else %}
+		<link rel="alternate" type="application/rss+xml" title="Blog feed" href="http://{{ SITE.domain }}{{ request.path }}feed/" />
+	{% endif %}
+{% endblock extra_head %}
+
+{% block form_content %}
+	{% for post in posts %}
+		{% include 'blog/post.inc.html' %}
+		{% if not forloop.last %}<hr />{% endif %}
+	{% endfor %}
+{% endblock form_content %}

@@ -1,0 +1,12 @@
+Hi {{ author.first_name|default:author.username }}.
+
+Someone has commented on your {{ comment.content_type }} entitled "{{ comment.content_object }}".
+
+Name: {{ comment.name }}  
+Email address: {{ comment.email }}{% if comment.website %}  
+Website: {{ comment.website }}{% endif %}
+
+{{ comment.body }}
+
+To approve or delete this comment, go to  
+http://{{ SITE.domain }}{% url admin:comments_comment_change comment.pk %}

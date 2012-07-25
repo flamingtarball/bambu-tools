@@ -1,0 +1,23 @@
+{% load blog %}
+
+<div class="well" data-importance="3">
+	{% if dates.count > 0 %}
+		<h3>Archive</h3>
+		<ul class="unstyled">
+			{% for date in dates|slice:':12' %}
+				<li><a href="{% url blog_posts_by_month date.year date|date:'m' %}">{{ date|date }}</a></li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+	
+	{% if categories.count > 0 %}
+		<h3>Categories</h3>
+		<ul class="unstyled">
+			{% for category in categories %}
+				<li><a href="{% url blog_posts_by_category category.slug %}">{{ category.name }}</a></li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+	
+	{% tag_cloud %}
+</div>

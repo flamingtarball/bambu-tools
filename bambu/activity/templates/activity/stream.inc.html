@@ -1,0 +1,51 @@
+{% load icons %}
+
+{% for stream in streams|slice:':5' %}
+	{% if show_headers %}
+		<h2>
+			{% if stream.get_absolute_url %}<a href="{{ stream.get_absolute_url }}">{% endif %}
+			{{ stream }}
+			{% if stream.get_absolute_url %}</a>{% endif %}
+		</h2>
+	{% endif %}
+	
+	<table class="table-condensed activity-stream" width="100%">
+		<tbody>
+			{% for action in stream.actions.all|slice:':10' %}
+				<tr id="action-{{ action.pk }}" valign="top">
+					<td class="icon" width="16">
+						{% if action.kind == 'created' or action.kind == 'added' %}
+							{% icon 'plus' %}
+						{% else %}
+							{% ifequal action.kind 'updated' %}
+								{% icon 'ok' %}
+							{% else %}
+								{% ifequal action.kind 'deleted' %}
+									{% icon 'remove' %}
+								{% else %}
+									{% ifequal action.kind 'archived' %}
+										{% icon 'trash' %}
+									{% else %}
+										{% ifequal action.kind 'restored' %}
+											{% icon 'ok' %}
+										{% else %}
+											{% icon 'cog' %}
+										{% endifequal %}
+									{% endifequal %}
+								{% endifequal %}
+							{% endifequal %}
+						{% endif %}
+					</td>
+					
+					<td>
+						{{ action.message_html|safe }}
+						{% if condensed %}<small>{{ action.date|timesince }} ago</small>{% endif %}
+					</td>
+					{% if not condensed %}<td width="20%">{{ action.date|timesince }} ago</td>{% endif %}
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	
+	{% if not forloop.last %}<hr />{% endif %}
+{% endfor %}

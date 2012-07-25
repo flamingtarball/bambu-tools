@@ -1,0 +1,93 @@
+{% extends 'saas/profile/base.html' %}
+
+{% block page_header %}
+	<h1>Connect your social profiles</h1>
+{% endblock page_header %}
+
+{% block form_content %}
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>Website</th>
+				<th>Identity</th>
+				<th>Actions</th>
+				<th width="5%">Connection</th>
+			</tr>
+		</thead>
+		
+		<tbody>
+			{% for connection in connections %}
+				<tr>
+					<td>{{ connection.verbose_name }}</td>
+					<td>
+						{% if connection.connected %}
+							{{ connection.identity }}
+						{% else %}
+							<em>Not connected</em>
+						{% endif %}
+					</td>
+					<td>
+						{% if connection.actions|length > 0 %}
+							<p>Post a message when I</p>
+							<ul class="unstyled">
+							{% for action in connection.actions %}
+								<li>
+									<label class="checkbox">
+										<input data-provider="{{ connection.name }}" data-model="{{ action.name }}" type="checkbox"{% if action.enabled %} checked{% else %}{% if not connection.connected %} disabled{% endif %}{% endif %} /> {{ action.verbose_name }}
+									</label>
+								</li>
+							{% endfor %}
+							</ul>
+						{% endif %}
+					</td>
+					<td>
+						{% if connection.connected %}
+							<a href="{% url megaphone_deauth %}?provider={{ connection.name|urlencode }}" class="btn btn-danger">Disconnect</a>
+						{% else %}
+							<a data-original-title="Popover title" href="{% url megaphone_auth %}?provider={{ connection.name|urlencode }}" class="btn btn-success">Connect</a>
+						{% endif %}
+					</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+{% endblock form_content %}
+
+{% block javascript %}
+	{{ block.super }}
+	
+	<script>
+		$(document).ready(
+			function() {
+				$('input[data-model]').bind('click',
+					function(e) {
+						var checked = $(this).attr('checked');
+						var url = '';
+						$(this).attr('disabled', 'disabled');
+						if(checked) {
+							url = '{% url connect_add_action %}'
+						} else {
+							url = '{% url connect_delete_action %}'
+						}
+						
+						url += '?provider=' + $(this).attr('data-provider');
+						url += '&model=' + $(this).attr('data-model');
+						
+						$.ajax(
+							{
+								url: url,
+								dataType: 'text',
+								context: $(this),
+								success: function(data) {
+									if(data == 'OK') {
+										$(this).removeAttr('disabled');
+									}
+								}
+							}
+						);
+					}
+				);
+			}
+		);
+	</script>
+{% endblock javascript %}

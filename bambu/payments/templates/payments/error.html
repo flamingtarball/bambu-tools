@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block page_header %}
+	<h1>Payment processing error</h1>
+{% endblock page_header %}
+
+{% block form_content %}
+	<div class="span6">
+		<p>
+			Sorry, but it has not been possible to complete your payment. Please
+			<a href="/contact/">contact us</a> to arrange a payment option.
+		</p>
+		
+		<p>
+			Your account should not have been charged, but if it has, do get in touch
+			straight away and we will reimburse you if you wish not to continue with
+			{{ SITE.name }}.
+		</p>
+		
+		{% if debug %}
+			<h2>Debug information</h2>
+			<dl>
+			{% for key, value in exception.1.items %}
+				<dt>{{ key }}</dt>
+				<dd>{{ value }}</dd>
+			{% endfor %}
+			</dl>
+		{% endif %}
+	</div>
+{% endblock form_content %}
