@@ -6,6 +6,7 @@ from urllib import urlopen
 from datetime import datetime
 from uuid import uuid4
 from os import path
+from time import mktime
 
 def get_provider(name, instance = False):
 	mod, dot, klass = name.rpartition('.')
@@ -85,10 +86,9 @@ def check_provider_channel(provider, channel, user):
 								**i
 							)
 						except Exception, ex:
-							raise
 							logger.error('Error getting item: %s' % unicode(ex))
 					else:
-						logging.info('Ignoring item %s' % i['url'])
+						logger.info('Ignoring item %s' % i['url'])
 			
 			feed.checked = datetime.utcnow().replace(tzinfo = utc)
 			feed.save()
@@ -145,14 +145,14 @@ def get_noun(model):
 	).get(
 		'noun', unicode(model._meta.verbose_name)
 	)
-	
+
 def upload_item_media(instance, filename):
 	return 'megaphone/%s/%s%s' % (
 		instance.feed.service.user,
 		unicode(uuid4()),
 		path.splitext(filename)[-1]
 	)
-	
+
 def fix_url(url):
 	try:
 		response = urlopen(url)
@@ -164,3 +164,6 @@ def fix_url(url):
 			return url
 	except:
 		return url
+		
+def unix_timestamp(date):
+	return int(mktime(date.timetuple()))

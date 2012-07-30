@@ -1,0 +1,88 @@
+{% extends "admin/base_site.html" %}
+{% load i18n icons %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% load adminmedia %}{% admin_media_prefix %}css/dashboard.css" />{% endblock %}
+{% block bodyclass %}dashboard{% endblock %}
+{% block breadcrumbs %}{% endblock %}
+{% block content %}
+	<div id="content-main">
+	{% if app_list %}
+		{% for app in app_list %}
+			<div class="module row">
+				<div class="span2">
+					<h3>
+						<a href="{{ app.app_url }}" class="section">{% blocktrans with app.name as name %}{{ name }}{% endblocktrans %}</a>
+					</h3>
+				</div>
+				
+				<div class="span6">
+					<table class="table" summary="{% blocktrans with app.name as name %}Models available in the {{ name }} application.{% endblocktrans %}">
+						{% for model in app.models %}
+							<tr>
+							{% if model.perms.change %}
+								<th scope="row"><a href="{{ model.admin_url }}">{{ model.name }}</a></th>
+							{% else %}
+								<th scope="row">{{ model.name }}</th>
+							{% endif %}
+							
+							{% if model.perms.add %}
+								<td><a href="{{ model.admin_url }}add/" class="addlink btn btn-success">{% icon 'plus' 'white' %} {% trans 'Add' %}</a></td>
+							{% else %}
+								<td>&nbsp;</td>
+							{% endif %}
+							
+							{% if model.perms.change %}
+								<td><a href="{{ model.admin_url }}" class="changelink btn btn-primary">{% icon 'pencil' 'white' %} {% trans 'Change' %}</a></td>
+							{% else %}
+								<td>&nbsp;</td>
+							{% endif %}
+							</tr>
+						{% endfor %}
+					</table>
+				</div>
+			</div>
+		{% endfor %}
+	{% else %}
+		<p>{% trans "You don't have permission to edit anything." %}</p>
+	{% endif %}
+	</div>
+{% endblock content %}
+
+{% block sidebar %}
+	<div id="content-related">
+		<div class="module" id="recent-actions-module">
+			<h2>{% trans 'Recent actions' %}</h2>
+			
+			<div class="well">
+				<h3>{% trans 'My actions' %}</h3>
+				{% load log %}
+				{% get_admin_log 10 as admin_log for_user user %}
+				{% if not admin_log %}
+					<p>{% trans 'None available' %}</p>
+				{% else %}
+					<ul class="actionlist unstyled">
+						{% for entry in admin_log %}
+						<li><p>
+							{% if entry.is_addition %}{% icon 'plus' %}{% endif %}
+							{% if entry.is_change %}{% icon 'pencil' %}{% endif %}
+							{% if entry.is_deletion %}{% icon 'remove' %}{% endif %}
+							
+							{% if entry.is_deletion or not entry.get_admin_url %}
+								{{ entry.object_repr }}
+							{% else %}
+								<a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
+							{% endif %}
+							
+							{% if entry.content_type %}
+								<small class="mini quiet">{% filter capfirst %}{% trans entry.content_type.name %}{% endfilter %}</small>
+							{% else %}
+								<small class="mini quiet">{% trans 'Unknown content' %}</small>
+							{% endif %}
+						</p></li>
+						{% endfor %}
+					</ul>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+{% endblock sidebar %}

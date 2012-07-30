@@ -1,0 +1,49 @@
+{% load i18n %}
+<fieldset class="module aligned {% for class in fieldset.classes.split %}{% if not class == 'collapse' and not class == 'closed' %}{{ class }} {% endif %}{% endfor %}">
+	{% if fieldset.name %}<h3 class="pull-left">{{ fieldset.name }}</h3>{% endif %}
+	{% if 'collapse' in fieldset.classes.split %}
+		<a class="pull-right">{% if 'closed' in fieldset.classes.split %}{% trans 'Open' %}{% else %}{% trans 'Close' %}{% endif %}</a>
+	{% endif %}
+	
+	<div class="clearfix"></div>
+	{% if fieldset.description %}
+		<div class="description">{{ fieldset.description|safe }}</div>
+	{% endif %}
+	
+	{% if 'collapse' in fieldset.classes.split %}<div class="collapse{% if not 'closed' in fieldset.classes.split %} in{% endif %}">{% endif %}
+		<hr />
+		{% for line in fieldset %}
+			<div class="form-row control-group{% if line.fields|length_is:'1' and line.errors %} error{% endif %}{% for field in line %} {{ field.field.name }}{% endfor %}">
+				{% for field in line %}
+					<div{% if not line.fields|length_is:'1' %} class="field-box{% if not field.is_readonly and field.errors %} errors{% endif %}"{% endif %}>
+						{% if not field.is_checkbox %}
+							<label class="control-label" for="id_{{ field.field.html_name }}">{{ field.field.label }}</label>
+						{% endif %}
+					
+						<div class="controls">
+							{% if field.is_checkbox %}
+								<label class="checkbox">{{ field.field }} {{ field.field.label }}</label>
+							{% else %}
+								{% if field.is_readonly %}
+									<p>{{ field.contents }}</p>
+								{% else %}
+									{{ field.field }}
+								{% endif %}
+							{% endif %}
+					
+							<span class="help-inline">
+								{% if field.field.errors %}
+									{{ field.field.errors|join:'<br />' }}
+								{% else %}
+									{% if field.field.help_text %}
+										{{ field.field.help_text }}
+									{% endif %}
+								{% endif %}
+							</span>
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+		{% endfor %}
+	{% if 'collapse' in fieldset.classes.split %}</div>{% endif %}
+</fieldset>

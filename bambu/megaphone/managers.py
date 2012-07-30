@@ -79,6 +79,7 @@ class ItemManager(Manager):
 				
 				if isinstance(a['file'], tuple):
 					func, name = a['file']
+					
 					try:
 						f = func(name)
 					except:

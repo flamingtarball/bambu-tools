@@ -11,6 +11,7 @@ class FeedJob(cron.CronJob):
 		
 		for feed in Feed.objects.all():
 			if not feed.checked or (date - feed.checked).seconds > feed.frequency * 60:
+				logger.info('Checking feed "%s"' % unicode(feed))
 				feed.check()
 
 cron.site.register(FeedJob)

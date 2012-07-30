@@ -1,4 +1,5 @@
 from bambu.megaphone.providers import ProviderBase
+from bambu.megaphone.helpers import unix_timestamp
 from django.utils import simplejson
 from django.utils.timezone import utc
 from dateutil.parser import parse
@@ -6,7 +7,7 @@ from datetime import datetime, timedelta
 from httplib import HTTPException
 from urllib import urlopen
 from os import path
-import logging, re
+import logging, re, time
 
 EPOCH = datetime(1970, 1, 1).replace(tzinfo = utc)
 
@@ -22,6 +23,7 @@ class LastFMProvider(ProviderBase):
 	oauth_token_GET_param = 'token'
 	albums = {}
 	artists = {}
+	tags = ('listen', 'lastfm')
 	
 	def get_token_and_auth_url(self):
 		return '', self.get_authorisation_url()
@@ -132,42 +134,34 @@ class LastFMProvider(ProviderBase):
 		kwargs = {'page': 1}
 		
 		if not latest_item is None:
-			td = latest_item.date - EPOCH
-			
-			kwargs['from'] = int(
-				(
-					td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6
-				) / 1e6
-			)
-			
-			td = datetime.now().replace(tzinfo = utc) - EPOCH
-			kwargs['to'] = int(
-				(
-					td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6
-				) / 1e6
-			)
+			kwargs['from'] = unix_timestamp(latest_item.date)
+			kwargs['to'] = unix_timestamp(datetime.now().replace(tzinfo = utc))
 		
 		while True:
 			try:
-				data = simplejson.load(
-					self.fetch_url(self.endpoint,
-						sk = access_token,
-						method = 'user.getRecentTracks',
-						limit = 200,
-						format = 'json',
-						user = identity,
-						**kwargs
-					)
+				data = self.fetch_url(self.endpoint,
+					sk = access_token,
+					method = 'user.getRecentTracks',
+					limit = 200,
+					format = 'json',
+					user = identity,
+					**kwargs
 				)
-				
-				if 'error' in data and 'message' in data:
-					logger.error(data.get('message'))
-					break
 			except HTTPException:
 				logger.error('Got bad HTTP response when looking for latest tracks')
 				break
 			except IOError:
 				logger.error('IO error when looking for latest tracks')
+				break
+			
+			try:
+				data = simplejson.load(data)
+				
+				if 'error' in data and 'message' in data:
+					logger.error(data.get('message'))
+					break
+			except:
+				logger.error('Parsing error')
 				break
 			
 			tracks = data.get('recenttracks', {}).get('track', [])
@@ -177,6 +171,7 @@ class LastFMProvider(ProviderBase):
 			if isinstance(tracks, dict):
 				tracks = [tracks]
 			
+			added = False
 			for track in tracks:
 				album = track.pop('album', {})
 				artist = track.pop('artist', {})
@@ -195,6 +190,8 @@ class LastFMProvider(ProviderBase):
 					continue
 				
 				date = parse(track.pop('date', {}).get('#text')).replace(tzinfo = utc)
+				if latest_item and date < latest_item.date:
+					continue
 				
 				if 'mbid' in album and album['mbid']:
 					try:
@@ -232,6 +229,13 @@ class LastFMProvider(ProviderBase):
 					'data': track,
 					'parent': parent
 				}
+				
+				added = True
 			
-			kwargs['page'] += 1
-			print 'Moving to page %(page)d' % kwargs
+			if added:
+				kwargs['page'] += 1
+				logger.debug('Moving to page %(page)d' % kwargs)
+				# sleep(1)
+			else:
+				logger.debug('No new items added; abandoning pagination')
+				break

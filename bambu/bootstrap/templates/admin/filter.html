@@ -1,0 +1,12 @@
+{% load i18n %}
+<dl class="dl-horizontal">
+	<dt>{{ title|capfirst }}</dt>
+	
+	{% for choice in choices %}
+		<dd>
+			{% if not choice.selected %}<a href="{{ choice.query_string|iriencode }}">{% endif %}
+				{{ choice.display }}
+			{% if not choice.selected %}</a>{% endif %}
+		</dd>
+	{% endfor %}
+</dl>

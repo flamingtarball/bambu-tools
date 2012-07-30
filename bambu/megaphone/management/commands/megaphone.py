@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from optparse import make_option
 
 class Command(BaseCommand):
-	help = 'Run tasks at scheduled intervals'
+	help = 'Retrieve posts from megaphone-connected sites'
 	option_list = BaseCommand.option_list + (
 		make_option('--clear',
 			action = 'store_true',

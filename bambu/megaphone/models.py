@@ -7,6 +7,7 @@ from django.template import Template, Context
 from django.template.defaultfilters import truncatewords
 from bambu.megaphone import helpers
 from bambu.megaphone.managers import *
+from bambu.megaphone import site
 from bambu.attachments.models import Attachment
 from datetime import datetime
 from taggit.managers import TaggableManager
@@ -348,6 +349,7 @@ class ServiceFeed(Feed):
 
 class RSSFeed(Feed):
 	url = models.URLField(u'RSS URL', unique = True)
+	tags = TaggableManager()
 	
 	def __unicode__(self):
 		scheme, netloc, path, params, query, fragment = urlparse(self.url)

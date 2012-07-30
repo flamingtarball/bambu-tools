@@ -20,6 +20,7 @@ class TwitterProvider(OAuthProviderBase):
 	use_ssl = False
 	public = True
 	channels = ('tweet',)
+	tags = ('message', 'twitter')
 	
 	def get_identity_link(self, identity):
 		return 'http://twitter.com/%s' % identity
@@ -71,7 +72,7 @@ class TwitterProvider(OAuthProviderBase):
 				return
 			
 			if len(items) == 0 or not isinstance(items, (list, tuple)):
-				break
+				raise Exception(items)
 			
 			for item in items:
 				user = item.pop('user')
@@ -92,7 +93,7 @@ class TwitterProvider(OAuthProviderBase):
 						fixed = fix_url(url.get('expanded_url'))
 						if feed.items.filter(url__startswith = url):
 							existing_urls = True
-							break
+							continue
 						
 						text = text.replace(
 							url.get('url'), fix_url(fixed)

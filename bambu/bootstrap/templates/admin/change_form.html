@@ -1,0 +1,80 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_modify adminmedia icons %}
+{% load url from future %}
+
+{% block extrahead %}{{ block.super }}
+	{% url 'admin:jsi18n' as jsi18nurl %}
+	<script type="text/javascript" src="{{ jsi18nurl|default:"../../../jsi18n/" }}"></script>
+	{{ media }}
+{% endblock %}
+
+{% block bodyclass %}{{ opts.app_label }}-{{ opts.object_name.lower }} change-form{% endblock %}
+
+{% block breadcrumbs %}{% if not is_popup %}
+	<ul class="breadcrumb">
+		<li><a href="../../../">{% trans "Home" %}</a> <span class="divider">&gt;</span></li>
+		<li><a href="../../">{{ app_label|capfirst|escape }}</a> <span class="divider">&gt;</span></li>
+		<li>{% if has_change_permission %}<a href="../">{{ opts.verbose_name_plural|capfirst }}</a> <span class="divider">&gt;</span>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}</li>
+		{% if add %}<li>{% trans "Add" %} {{ opts.verbose_name }}{% else %}{{ original|truncatewords:"18" }}</li>{% endif %}
+	</ul>
+{% endif %}{% endblock %}
+
+{% block content %}
+	<div id="content-main">
+		<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.module_name }}_form" class="form-horizontal">{% csrf_token %}{% block form_top %}{% endblock %}
+			<div>
+				{% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
+				{% if errors %}
+					<div class="alert alert-error" class="errornote">
+						{% blocktrans count errors|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+					</div>
+					
+					{{ adminform.form.non_field_errors }}
+				{% endif %}
+				
+				{% for fieldset in adminform %}
+					{% include "admin/includes/fieldset.html" %}
+				{% endfor %}
+				
+				{% block after_field_sets %}{% endblock %}
+				
+				{% for inline_admin_formset in inline_admin_formsets %}
+					{% include inline_admin_formset.opts.template %}
+				{% endfor %}
+
+				{% block after_related_objects %}{% endblock %}
+				
+				{% submit_row %}
+				
+				{% if adminform and add %}
+				   <script type="text/javascript">document.getElementById("{{ adminform.first_field.id_for_label }}").focus();</script>
+				{% endif %}
+				
+				{# JavaScript for prepopulated fields #}
+				{% prepopulated_fields_js %}
+			</div>
+		</form>
+	</div>
+{% endblock %}
+
+{% block sidebar %}
+	{% block object-tools %}
+		{% if change and not is_popup %}
+		<div class="well">
+			<ul class="object-tools unstyled">
+				{% block object-tools-items %}
+					<li>
+						<a href="history/" class="historylink">{% icon 'time' %} {% trans "History" %}</a>
+					</li>
+					
+					{% if has_absolute_url %}
+						<li>
+							<a href="../../../r/{{ content_type_id }}/{{ object_id }}/" class="viewsitelink">{% icon 'arrow-right' %} {% trans "View on site" %}</a>
+						</li>
+					{% endif%}
+				{% endblock %}
+			</ul>
+		</div>
+		{% endif %}
+	{% endblock %}
+{% endblock sidebar %}

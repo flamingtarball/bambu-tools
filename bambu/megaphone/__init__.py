@@ -32,7 +32,7 @@ def broadcast(obj, user):
 	
 	if actions.count() == 0:
 		logger.info(
-			u'%s "%s" has already been broadcast' % (
+			u'%s "%s" has already been broadcast or no actions setup' % (
 				str(obj._meta.verbose_name).capitalize(),
 				unicode(obj)
 			)

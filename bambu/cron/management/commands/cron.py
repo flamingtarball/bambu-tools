@@ -51,5 +51,5 @@ class Command(BaseCommand):
 			cron.site.run(options['force'], options['debug'])
 		finally:
 			if flag and path.exists(flag):
-				logger.debug('Removing flag file "%s"' % flag)
 				remove(flag)
+				logger.debug('Removed flag file "%s"' % flag)

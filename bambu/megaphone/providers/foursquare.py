@@ -20,6 +20,7 @@ class FoursquareProvider(OAuthProviderBase):
 	public = True
 	token_required = False
 	channels = ('checkin',)
+	tags = ('checkin', 'foursquare')
 	
 	def get_authorisation_url(self):
 		from django.core.urlresolvers import reverse
