@@ -43,7 +43,9 @@
 					'logo.position': 'top-left',
 					'logo.link': 'http://{{ SITE.domain }}/'{% if streamer %},
 					'provider': 'rtmp',
-					'streamer': '{{ streamer }}'{% endif %},
+					'streamer': '{{ streamer }}'{% else %},
+					'provider': 'http',
+					'http.startparam': 'start'{% endif %},
 					'modes': [
 						{
 							'type': 'flash',
