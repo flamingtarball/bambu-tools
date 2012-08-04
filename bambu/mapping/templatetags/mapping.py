@@ -182,8 +182,6 @@ class MapNode(ParamNode):
 		
 		if not request or not request.is_ajax():
 			portions.append('$(document).ready(function() {')
-		else:
-			portions.append('$(document).on(\'rebind\', function() {')
 		
 		portions.append(provider.init_map())
 		
@@ -206,7 +204,9 @@ class MapNode(ParamNode):
 				provider.add_map_callback(kwargs['callback'])
 			)
 		
-		portions.append('});')
+		if not request or not request.is_ajax():
+			portions.append('});')
+		
 		portions.append('</script>')
 		
 		if kwargs.get('advanced'):
@@ -291,3 +291,20 @@ def marker_tag(parser, token):
 	args, kwargs = parse_args(args, tag, marker_args)
 	
 	return MarkerNode(*args, **kwargs)
+
+@register.simple_tag(takes_context = True)
+def map_header(context):
+	module, comma, klass = PROVIDER.rpartition('.')
+	module = import_module(module)
+	klass = getattr(module, klass)
+	kwargs = copy.deepcopy(getattr(settings, 'MAPPING_SETTINGS', {}))
+	
+	portions = []
+	for js in getattr(klass.Media, 'js', ()):
+		portions.append('<script src="%s"></script>' % js % kwargs)
+	
+	for css in getattr(klass.Media, 'css', ()):
+		portions.append('<link href="%s" rel="stylesheet" />' % csss % kwargs)
+	
+	context['_MAPPING_MEDIA'] = True
+	return ''.join(portions)
