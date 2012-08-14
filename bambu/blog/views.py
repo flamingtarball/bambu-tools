@@ -191,7 +191,7 @@ def post_comment(request, year, month, day, slug):
 			messages.SUCCESS,
 			u'Your comment has been submitted successfully.'
 		)
-	
+		
 		return HttpResponseRedirect(
 			'%s?comment-sent=true' % post.get_absolute_url()
 		)

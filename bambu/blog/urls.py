@@ -3,7 +3,7 @@ from bambu.bootstrap.decorators import body_classes
 from bambu.blog.views import posts, post
 from bambu.blog.feeds import BlogFeed
 
-urlpatterns = patterns('',
+urlpatterns = patterns('bambu.blog.views',
 	url(r'^$', body_classes(posts, 'blog'), name = 'blog_posts'),
 	url(r'^feed/$', BlogFeed(), name = 'blog_posts_feed'),
 	url(r'^(?P<year>\d{4})/$', body_classes(posts, 'blog', 'blog-year'), name = 'blog_posts_by_year'),
