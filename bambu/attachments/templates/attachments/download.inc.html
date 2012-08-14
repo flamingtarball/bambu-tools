@@ -1,6 +1,6 @@
 {% load icons %}
 <p>
-	<a href="{{ attachment.url }}" class="attachment-link attachment-download btn">
+	<a href="{{ attachment.file.url }}" class="attachment-link attachment-download btn">
 		{% icon 'download' %} {{ attachment.title }}
 		<small>({{ attachment.size|filesizeformat }})</small>
 	</a>
