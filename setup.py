@@ -3,7 +3,7 @@ from distutils.core import setup
 
 setup(
 	name = 'bambu-tools',
-	version = '2.1.5.1',
+	version = '2.1.7',
 	description = 'Tools for Django webapps',
 	author = 'Mark Steadman',
 	author_email = 'mark@flamingtarball.com',
@@ -37,6 +37,7 @@ setup(
 		'bambu.opengraph', 'bambu.opengraph.templatetags',
 		'bambu.saas', 'bambu.saas.migrations',
 		'bambu.simplerest', 'bambu.simplerest.poster',
+		'bambu.sites',
 		'bambu.tasks', 'bambu.tasks.migrations',
 		'bambu.uploadify', 'bambu.uploadify.migrations',
 		'bambu.urlshortener', 'bambu.urlshortener.migrations'
